@@ -28,7 +28,7 @@
         ?>
         <input type="hidden" class="date_day" value="<?php echo date('d');?>">
         <h2 class="main_head"><span><?php _e('Plugin Activities')?></span></h2> 
-        <?php echo $message; ?>
+        <?php echo esc_attr($message); ?>
         <form id="form_mpa_list" method="GET" class="form_mpa_list">
             <input type="hidden" name="page" value="mpa_main_menu"/>
             <?php $table->display(); ?>

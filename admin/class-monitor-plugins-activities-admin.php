@@ -124,7 +124,10 @@ class Monitor_Plugins_Activities_Admin {
 
 	function inject_main_menu_scripts(){
 		wp_enqueue_style( 'mpa_daterange_style', plugin_dir_url( __FILE__ ) .  'css/daterangepicker.css', array(), time() , 'all' ); 
-		wp_enqueue_script( 'mpa_momentjs', plugin_dir_url( __FILE__ ) . 'js/moment.min.js', array( 'jquery'), time(), true );
+		$path    = "/wp-includes/js/dist/vendor/moment.js";
+		wp_enqueue_script( 'moment' , site_url($path) ,array( 'jquery'), '2.26.0');
+
+		
 		wp_enqueue_script( 'mpa_daterange_js', plugin_dir_url( __FILE__ ) . 'js/daterangepicker.min.js', array( 'jquery'), time(), true );
 		wp_enqueue_script( 'mpa_main_menu_list', plugin_dir_url( __FILE__ ) . 'js/list.js', array( 'jquery' ), $this->version, false );
 	}

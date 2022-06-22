@@ -235,7 +235,7 @@ class MPA_List_Log_Table extends WP_List_Table
             <tbody id="the-list"
                 <?php
                 if ( $singular ) {
-                    echo " data-wp-lists='list:$singular'";
+                    echo " data-wp-lists='list:".$singular."'";
                 }
                 ?>
                 >
@@ -265,11 +265,11 @@ class MPA_List_Log_Table extends WP_List_Table
 		switch($column_name) {
 
             case 'LOG_ID':
-                echo '<span class="" >'.$item['ID'].'</span>';
+                echo '<span class="" >'.esc_attr($item['ID']).'</span>';
             break;
 
             case 'ip':
-                echo $details['meta']['action_ip'];
+                echo esc_attr($details['meta']['action_ip']);
 			break;
 			
             case 'plugin_name':
@@ -306,15 +306,15 @@ class MPA_List_Log_Table extends WP_List_Table
             break;
 
             case 'version' :
-                echo $details['meta']['plugin_version'];
+                echo esc_attr($details['meta']['plugin_version']);
             break;
 
             case 'author' :
-                echo '<a href="'.$details['meta']['author_uri'].'" target="_blank" >'.$details['meta']['author_name'].'</a>';
+                echo '<a href="'.esc_attr($details['meta']['author_uri']).'" target="_blank" >'.esc_attr($details['meta']['author_name']).'</a>';
             break;
 
             case 'description' :
-                echo $details['meta']['plugin_description'];
+                echo esc_attr($details['meta']['plugin_description']);
             break;
 
             case 'user' :
@@ -325,7 +325,7 @@ class MPA_List_Log_Table extends WP_List_Table
                     if ( $user instanceof WP_User && 0 !== $user->ID ) {
                         echo sprintf(
                             '<a href="%s" target="_blank" class="mpa_logbyuser">%s <span class="mpa-author-name">%s</span><br><span class="aal-author-caps">%s</span></a>',
-                            admin_url('user-edit.php?user_id='.$user->ID),
+                            admin_url('user-edit.php?user_id='.esc_attr($user->ID)),
                             get_avatar( $user->ID, 35 ),
                             ucfirst($user->display_name),
                             isset( $user->roles[0] ) && isset( $wp_roles->role_names[ $user->roles[0] ] ) ? $wp_roles->role_names[ $user->roles[0] ] : 'Undefined'
