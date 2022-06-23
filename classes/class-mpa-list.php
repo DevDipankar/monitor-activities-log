@@ -235,7 +235,7 @@ class MPA_List_Log_Table extends WP_List_Table
             <tbody id="the-list"
                 <?php
                 if ( $singular ) {
-                    echo " data-wp-lists='list:".$singular."'";
+                    echo " data-wp-lists='list:".esc_attr($singular)."'";
                 }
                 ?>
                 >
@@ -292,17 +292,17 @@ class MPA_List_Log_Table extends WP_List_Table
 			break;
 
             case 'action_type':
-                echo $details['meta']['action_type'];
+                echo esc_attr($details['meta']['action_type']);
             break;
 
             case 'time':
                 $posted = get_the_time('U',$item['ID']);
                 echo '<span style="color:green;font-weight:bold;">'.human_time_diff($posted,current_time( 'U' )). " ago</span>";
-                echo '[ '.$item['post_date'].' ]';
+                echo esc_attr('[ '.$item['post_date'].' ]');
 			break;
 
             case 'message' :
-                echo $details['post']->post_content;
+                echo esc_attr($details['post']->post_content);
             break;
 
             case 'version' :
