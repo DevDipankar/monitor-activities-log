@@ -4,11 +4,6 @@
 	
     $table = new MPA_List_Log_Table();
     $table->prepare_items();
-	
-    $message = '';
-    if ('delete' === $table->current_action()) {
-        $message = '<div class="updated below-h2" id="message"><p>' . sprintf(__('Items deleted: %d', 'bc_booking_system'), count($_REQUEST['id'])) . '</p></div>';
-    }
 
     ?>
     <div class="wrap">
@@ -28,7 +23,11 @@
         ?>
         <input type="hidden" class="date_day" value="<?php echo date('d');?>">
         <h2 class="main_head"><span><?php _e('Plugin Activities')?></span></h2> 
-        <?php echo esc_attr($message); ?>
+        <?php 
+            if ('delete' === $table->current_action()) {
+                echo '<div class="updated below-h2" id="message"><p>' . sprintf(__('Items deleted: %d', 'monitor_activities_log'), count(rest_sanitize_array($_REQUEST['id']))) . '</p></div>';
+            }
+        ?>
         <form id="form_mpa_list" method="GET" class="form_mpa_list">
             <input type="hidden" name="page" value="mpa_main_menu"/>
             <?php $table->display(); ?>

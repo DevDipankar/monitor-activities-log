@@ -9,7 +9,7 @@ if (!class_exists('WP_List_Table')) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 /**
- * bc_booking_system_List_Table class that will display our custom table
+ * 
  * records in nice table
  */
 class MPA_List_Log_Table extends WP_List_Table
@@ -66,7 +66,7 @@ class MPA_List_Log_Table extends WP_List_Table
                                 $two_date_value = date('F j, Y' , strtotime($explode[1]) );
                                 $fil_value = $one_date_value .' - '. $two_date_value;
                             }elseif( $fil_key == 'mpa_fil_users'){
-                                $get_user = get_user_by( 'id' , $_REQUEST['mpa_fil_users'] );
+                                $get_user = get_user_by( 'id' , sanitize_text_field($_REQUEST['mpa_fil_users']) );
                                 $fil_value = $get_user->display_name;
                             }elseif( $fil_key == 'mpa_fil_plugin'){
                                 $get_plugin_data = $this->plugin_list[ $_REQUEST['mpa_fil_plugin'] ];
@@ -442,7 +442,7 @@ class MPA_List_Log_Table extends WP_List_Table
         $table_name = $wpdb->prefix.'posts'; // do not forget about tables prefix
         $postmeta = $wpdb->prefix.'postmeta';
         if ('delete' === $this->current_action()) {
-            $ids = isset($_REQUEST['id']) ? $_REQUEST['id'] : array();
+            $ids = isset($_REQUEST['id']) ? rest_sanitize_array($_REQUEST['id']) : array();
             if (is_array($ids)) $ids = implode(',', $ids);
             if (!empty($ids)) {
                 $wpdb->query("DELETE FROM $table_name WHERE ID IN($ids)");
@@ -473,7 +473,7 @@ class MPA_List_Log_Table extends WP_List_Table
         // prepare query params, as usual current page, order by and order direction
         $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged']) - 1) : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'ID';
-        $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'desc';
+        $order = ( isset($_REQUEST['order']) && sanitize_sql_orderby($_REQUEST['order']) ) ? sanitize_text_field($_REQUEST['order']) : 'desc';
 
         $per_page = $per_page ? $per_page : 50;
 
