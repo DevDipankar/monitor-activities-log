@@ -174,10 +174,10 @@ class MPA_List_Log_Table extends WP_List_Table
             <div class="iconincfld">
             <label for="mpa_fil_date" class="screen-reader-text">Log date range</label>
                 <i class="fa fa-calendar first"></i>
-                <input type="text" name="mpa_fil_date" id="mpa_fil_date" placeholder="Log date range" autocomplete="off" value="<?php echo $c_a_r_s_value; ?>" class="fo-color" />
+                <input type="text" name="mpa_fil_date" id="mpa_fil_date" placeholder="Log date range" autocomplete="off" value="<?php echo esc_attr($c_a_r_s_value); ?>" class="fo-color" />
                 <i class="fa fa-times-circle d_clear second" id="c_req_dt" <?php if($start_cr_val){ echo 'style="display:inline-block;"';}?> ></i>
-                <input type="hidden" name="mpa_start_log_date" id="mpa_start_log_date" value="<?php echo $start_cr_val; ?>">
-                <input type="hidden" name="mpa_end_log_date" id="mpa_end_log_date" value="<?php echo $end_cr_val; ?>">
+                <input type="hidden" name="mpa_start_log_date" id="mpa_start_log_date" value="<?php echo esc_attr($start_cr_val); ?>">
+                <input type="hidden" name="mpa_end_log_date" id="mpa_end_log_date" value="<?php echo esc_attr($end_cr_val); ?>">
             </div>
     
 
@@ -194,11 +194,11 @@ class MPA_List_Log_Table extends WP_List_Table
 
     public function display_tablenav( $which ) {
 		if ( 'top' == $which ) {
-			$this->search_box( __( 'Search', 'aryo-activity-log' ), 'mpa-search' );
+			$this->search_box( __( 'Search', 'monitor_activities_log' ), 'mpa-search' );
 		}
         $this->bulk_actions( $which );
 		?>
-		<div class="tablenav <?php echo sanitize_text_field( $which ); ?>">
+		<div class="tablenav <?php echo esc_attr( $which ); ?>">
 			<?php
             
 			$this->extra_tablenav( $which );
@@ -215,8 +215,8 @@ class MPA_List_Log_Table extends WP_List_Table
 		$input_id = $input_id . '-search-input';
 		?>
 		<p class="search-box">
-			<label class="screen-reader-text" for="<?php echo $input_id ?>"><?php echo $text; ?>:</label>
-			<input type="search" id="<?php echo $input_id ?>" name="mpa_s" value="<?php echo sanitize_text_field( $search_data ); ?>" />
+			<label class="screen-reader-text" for="<?php echo esc_attr($input_id); ?>"><?php echo esc_attr($text); ?>:</label>
+			<input type="search" id="<?php echo esc_attr($input_id); ?>" name="mpa_s" value="<?php echo esc_attr( $search_data ); ?>" />
 			<?php submit_button( $text, 'button', false, false, array('id' => 'search-submit') ); ?>
 		</p>
 	<?php
@@ -278,13 +278,13 @@ class MPA_List_Log_Table extends WP_List_Table
                     '<a href="javascript:;"  data-link="%s" class="mpa_plugin_iframe" aria-label="%s" data-title="%s">%s</a>',
                     esc_url(
                         admin_url(
-                            'plugin-install.php?tab=plugin-information&plugin=' . $plugin_data[0] .
+                            'plugin-install.php?tab=plugin-information&plugin=' . esc_attr($plugin_data[0]) .
                             '&TB_iframe=true&width=900&height=750'
                         )
                     ),
                     /* translators: %s: Plugin name. */
-                    sanitize_text_field( sprintf( __( 'More information about %s' ), $details['meta']['plugin_name'] ) ),
-                    sanitize_text_field( $details['meta']['plugin_name'] ),
+                    esc_attr( sprintf( __( 'More information about %s' ), $details['meta']['plugin_name'] ) ),
+                    esc_attr( $details['meta']['plugin_name'] ),
                     __( $details['meta']['plugin_name'] )
                 );
                 //echo '<a href="javascript:;"  data-link="'.esc_url( admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $plugin_data[0] .'&TB_iframe=true&width=600&height=550' )).'" class="mpa_plugin_iframe" aria-label="'.$details['meta']['plugin_name'].'" data-title="'.sanitize_text_field( $details['meta']['plugin_name'] ).'">View details</a>';
