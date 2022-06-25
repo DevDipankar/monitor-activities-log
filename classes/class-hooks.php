@@ -1,4 +1,13 @@
 <?php
+/**
+ * @since 1.0.0
+ * 
+ * @package Monitor_Plugins_Activities
+ * @subpackage Monitor_Plugins_Activities/classes
+ * 
+ * Set all action/filter hooks of each plugin activities
+ * 
+ */
 class MPA_Hooks{
 
     protected $actions;

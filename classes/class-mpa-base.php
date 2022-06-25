@@ -1,33 +1,80 @@
 <?php
+/**
+ * @since 1.0.0
+ * 
+ * @package Monitor_Plugins_Activities
+ * @subpackage Monitor_Plugins_Activities/classes
+ * 
+ * Base class will handle all major operations
+ */
 final class MPA_Base{
 
+    /**
+     * @since 1.0.0
+     * @access  private
+     * @var object
+     * An instance of this class, 
+     */
     private static $_instance = null;
+
+    /**
+     * @since 1.0.0
+     * @access  public
+     * @var string
+     * Hold the home url
+     */
     public $settings;
+
+    /**
+     * @since 1.0.0
+     * @access  private
+     * @var int
+     * Hold Currently loggedin user id
+     */
     private $current_log_id;
+
+    /**
+     * @since 1.0.0
+     * @access  public
+     * @var string
+     * Post type slug, where all log will be saved, 
+     */
     public $post_type;
+
+    /**
+     * @since 1.0.0
+     * @access  public
+     * @var array
+     * Definition -  set of all plugin actions 
+     */
     public $action_types;
 
+    /**
+     * @since 1.0.0
+     * @access  public
+     * @param void
+     * 
+     */
     function __construct() {
         ob_start();
 		global $wpdb;
-
 		$this->settings  = get_option('home');
         $this->action_types = array(
-            'installed' => 'Plugin Installed',
-            'updated' => 'Plugin Updated',
-            //'deleted' => 'Plugin Deleted',
-            'activated' => 'Plugin Activated',
-            'deactivated' => 'Plugin Deactivated',
-            //'file_modified' => 'File Modified'
+            'installed'         => 'Plugin Installed',
+            'updated'           => 'Plugin Updated',
+            'activated'         => 'Plugin Activated',
+            'deactivated'       => 'Plugin Deactivated',
+            //'file_modified'   => 'File Modified'
+            //'deleted'         => 'Plugin Deleted',
         );
         $this->post_type = 'mpa_log';
 	}
 
     /**
 	 * Get real address
-	 * 
-	 * @since 2.1.4
-	 * 
+	 * @since 1.0.0
+     * @access  protected
+     * @param void
 	 * @return string real address IP
 	 */
 	protected function _get_ip_address() {
@@ -48,11 +95,19 @@ final class MPA_Base{
 				return $_SERVER[ $key ];
 			}
 		}
-		
 		// Fallback local ip.
 		return '127.0.0.1';
 	}
 
+
+    /**
+	 * Insert activities log into database $wpdb->post Table
+	 * @since 1.0.0
+     * @access  public
+     * @param array     $args   The set of data that is required to create logs
+     * 
+	 * @return int $mpa_log_id   Last created LOG ID
+	 */
     public function insert( $args ) {
 		global $wpdb;
         $abs_path = $args['action_type'] == 'installed' ? false : true ;
@@ -63,20 +118,20 @@ final class MPA_Base{
 
 		$args = wp_parse_args(
 			$args,
-			array(
-				'action_time'      => $time,
-                'action_ip'        => $this->_get_ip_address(),
-                'plugin_name'      => $_plugin_data['Name'],
-                'plugin_version'   => $_plugin_data['Version'],
-                'plugin_author'   => $_plugin_data['Author'],
-                'plugin_description'   => $_plugin_data['Description'],
-                'plugin_uri'   => $_plugin_data['PluginURI'],
-                'author_uri'   => $_plugin_data['AuthorURI'],
-                'title'   => $_plugin_data['Title'],
-                'author_name'   => $_plugin_data['AuthorName'],
-                'action_type'       => '',
-                'plugin' => '',
-			)
+                array(
+                    'action_time'           => $time,
+                    'action_ip'             => $this->_get_ip_address(),
+                    'plugin_name'           => $_plugin_data['Name'],
+                    'plugin_version'        => $_plugin_data['Version'],
+                    'plugin_author'         => $_plugin_data['Author'],
+                    'plugin_description'    => $_plugin_data['Description'],
+                    'plugin_uri'            => $_plugin_data['PluginURI'],
+                    'author_uri'            => $_plugin_data['AuthorURI'],
+                    'title'                 => $_plugin_data['Title'],
+                    'author_name'           => $_plugin_data['AuthorName'],
+                    'action_type'           => '',
+                    'plugin'                => '',
+                )
 		);
         $args['plugin'] = $plugin;
 
@@ -96,9 +151,9 @@ final class MPA_Base{
             'post_content'  => $this->action_types[$args['action_type']],
             'post_status'   => 'inherit',
             'post_author'   => $args['user_id'],
-            'post_type' => $this->post_type,
-            'post-name' => '',
-            'post_date' => $time
+            'post_type'     => $this->post_type,
+            'post-name'     => '',
+            'post_date'     => $time
           );
            
         // Insert the post into the database
@@ -106,22 +161,43 @@ final class MPA_Base{
         $this->current_log_id = $mpa_log_id;
         foreach( $args as $mkey => $mval){
             $this->insert_meta($mkey,$mval);
-        }
-           
+        }      
 		do_action( 'mpa_insert_log', $args );
+        return $mpa_log_id;
 	}
 
-    function insert_meta($meta_key,$meta_value,$exit=false){
+
+    /**
+	 * Insert meta data for log - into $wpdb->postmeta Table
+	 * @since 1.0.0
+     * @access  public
+     * 
+     * @param string    $meta_key      The name of the meta key
+     * @param string    $meta_value    The value of the meta
+     * @param bool $exit  if true - current log id will be reset into a properties ($this->current_log_id)
+     * 
+	 * @return void
+	 */
+    public function insert_meta($meta_key,$meta_value,$exit=false){
         if($this->current_log_id){
             update_post_meta($this->current_log_id , $meta_key , $meta_value );
         }
         if($exit){
             $this->current_log_id = 0;
         }
-        
     }
 
-    function get_plugin_data($plugin,$absolute_path=true){
+
+    /**
+	 * Get plugin data such as Plugin Name, Plugin author, plugin Version etc from .readme file
+	 * @since 1.0.0
+     * @access  public
+     * @param string        $plugin                The name/absPath of the respective plugin.
+     * @param bool          $absolute_path         IF TRUE - the absolute path of the home directory will be concated with the relative path of the plugin.
+     * 
+	 * @return object plugin data
+	 */
+    public function get_plugin_data($plugin,$absolute_path=true){
         if(empty($plugin)){
             return false;
         }
@@ -133,14 +209,32 @@ final class MPA_Base{
         return get_plugin_data(  $plugin );   
     }
 
-    function path_split($relative_path){
-        if($relative_path){
-            $explode = explode( WP_PLUGIN_DIR . '/' , $relative_path );
+
+    /**
+	 * Split and retrive the relative path from a absolute path of a plugin.
+	 * @since 1.0.0
+     * @access  public
+     * @param string        $abs_path                The absolute path of the respective plugin.
+     * 
+	 * @return string Relative path
+	 */
+    public function path_split($abs_path){
+        if($abs_path){
+            $explode = explode( WP_PLUGIN_DIR . '/' , $abs_path );
             return $explode[1];
         }        
     }
 
-    function log_details($log_id){
+
+    /**
+	 * Retrive post data and post meta data of logs (posts)
+	 * @since 1.0.0
+     * @access  public
+     * @param int        $log_id                Post ID of the respective LOG
+     * 
+	 * @return array Post and PostMeta Data
+	 */
+    public function log_details($log_id){
         //print_r(get_plugins());die;
         $metaset = array(
             'action_time',
@@ -167,6 +261,17 @@ final class MPA_Base{
         );
     }
 
+
+    /**
+	 * Any method or properties of this class, can be called throug this instatnce
+	 * @since 1.0.0
+     * @access  public
+     * @param void
+     * 
+     * @return self::$_instance     Instance of this class
+     * 
+	 * @return array Post and PostMeta Data
+	 */
     public static function instance() {
 		if ( is_null( self::$_instance ) )
 			self::$_instance = new MPA_Base();
